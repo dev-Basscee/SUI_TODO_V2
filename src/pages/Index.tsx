@@ -9,8 +9,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Check, X, Trash2, AlertTriangle } from 'lucide-react';
 
 // Environment variables - these should be set in .env
-const PACKAGE_ID = process.env.VITE_PACKAGE_ID || 'YOUR_PACKAGE_ID';
-const MODULE_NAME = process.env.VITE_MODULE_NAME || 'todo_list';
+const PACKAGE_ID = import.meta.env.VITE_PACKAGE_ID || 'YOUR_PACKAGE_ID';
+const MODULE_NAME = import.meta.env.VITE_MODULE_NAME || 'todo_list';
 
 interface Todo {
   id: number;
