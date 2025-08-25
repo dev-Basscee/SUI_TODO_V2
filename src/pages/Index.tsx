@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { ConnectButton, useCurrentAccount, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
+import { ConnectButton, useCurrentAccount, useSignAndExecuteTransaction, useWallets } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Check, X, Trash2, AlertTriangle } from 'lucide-react';
+import { Plus, Check, X, Trash2, AlertTriangle, Wallet } from 'lucide-react';
+import { WalletNotInstalledDialog } from '@/components/WalletNotInstalledDialog';
 
 // Environment variables - these should be set in .env
 const PACKAGE_ID = import.meta.env.VITE_PACKAGE_ID || 'YOUR_PACKAGE_ID';
@@ -22,12 +23,27 @@ interface Todo {
 const Index = () => {
   const currentAccount = useCurrentAccount();
   const { mutate: signAndExecute, isPending } = useSignAndExecuteTransaction();
+  const wallets = useWallets();
   const { toast } = useToast();
   
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodoDescription, setNewTodoDescription] = useState('');
   const [todoListObjectId, setTodoListObjectId] = useState<string | null>(null);
   const [isCreatingList, setIsCreatingList] = useState(false);
+  const [showWalletDialog, setShowWalletDialog] = useState(false);
+
+  // Check for wallet availability and show dialog if needed
+  useEffect(() => {
+    const checkWallets = () => {
+      if (wallets.length === 0) {
+        const timer = setTimeout(() => {
+          setShowWalletDialog(true);
+        }, 1000); // Give time for wallets to load
+        return () => clearTimeout(timer);
+      }
+    };
+    checkWallets();
+  }, [wallets]);
 
   // Mock data for demonstration (in real app, fetch from Sui)
   useEffect(() => {
@@ -530,6 +546,12 @@ const Index = () => {
           )}
         </main>
       </div>
+      
+      {/* Wallet Not Installed Dialog */}
+      <WalletNotInstalledDialog 
+        open={showWalletDialog} 
+        onOpenChange={setShowWalletDialog} 
+      />
     </div>
   );
 };

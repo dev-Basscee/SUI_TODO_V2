@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SuiClientProvider, WalletProvider, lightTheme } from '@mysten/dapp-kit';
 import { getFullnodeUrl } from '@mysten/sui/client';
 import { createNetworkConfig } from '@mysten/dapp-kit';
+import '@mysten/dapp-kit/dist/index.css';
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -20,7 +21,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
-      <WalletProvider autoConnect theme={lightTheme}>
+      <WalletProvider theme={lightTheme} autoConnect>
         <TooltipProvider>
           <Toaster />
           <Sonner />
