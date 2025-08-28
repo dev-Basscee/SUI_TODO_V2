@@ -47,7 +47,6 @@
 //     self.name
 // }
 module todo_list::todo_list {
-
     use std::string::String;
     use std::vector;
     use sui::object::{Self, UID};
@@ -59,13 +58,13 @@ module todo_list::todo_list {
     public struct TodoList has key, store {
         id: UID,
         name: String,
-        items: vector<String>, // old storage still here for compatibility
+        items: vector<String>,
     }
 
     /// =========================
     /// New Struct for Advanced Items
     /// =========================
-    public struct TodoItem has store {
+    public struct TodoItem has store, drop {
         description: String,
         status: u8, // 0 = pending, 1 = done, 2 = cancelled
     }
@@ -92,11 +91,12 @@ module todo_list::todo_list {
     }
 
     public fun remove(list: &mut TodoList, index: u64): String {
+        assert!(index < vector::length(&list.items), 1);
         vector::remove(&mut list.items, index)
     }
 
     public fun delete(list: TodoList) {
-        let TodoList { id, name: _, items: _ } = list;
+        let TodoList { id, .. } = list;
         object::delete(id);
     }
 
@@ -128,21 +128,24 @@ module todo_list::todo_list {
     }
 
     public fun mark_done(list: &mut TodoListV2, index: u64) {
-        let item_ref = &mut vector::borrow_mut(&mut list.items, index);
+        assert!(index < vector::length(&list.items), 2);
+        let item_ref = vector::borrow_mut(&mut list.items, index);
         item_ref.status = 1;
     }
 
     public fun cancel(list: &mut TodoListV2, index: u64) {
-        let item_ref = &mut vector::borrow_mut(&mut list.items, index);
+        assert!(index < vector::length(&list.items), 3);
+        let item_ref = vector::borrow_mut(&mut list.items, index);
         item_ref.status = 2;
     }
 
     public fun remove_v2(list: &mut TodoListV2, index: u64): TodoItem {
+        assert!(index < vector::length(&list.items), 4);
         vector::remove(&mut list.items, index)
     }
 
     public fun delete_v2(list: TodoListV2) {
-        let TodoListV2 { id, name: _, items: _ } = list;
+        let TodoListV2 { id, items: _, .. } = list;
         object::delete(id);
     }
 
@@ -150,7 +153,17 @@ module todo_list::todo_list {
         vector::length(&list.items)
     }
 
-    public fun name_v2(self: &TodoListV2): String {
-        self.name
+    /// Helper function to get item status
+    public fun get_item_status(list: &TodoListV2, index: u64): u8 {
+        assert!(index < vector::length(&list.items), 5);
+        let item = vector::borrow(&list.items, index);
+        item.status
+    }
+
+    /// Helper function to get item description
+    public fun get_item_description(list: &TodoListV2, index: u64): String {
+        assert!(index < vector::length(&list.items), 6);
+        let item = vector::borrow(&list.items, index);
+        item.description
     }
 }

@@ -204,7 +204,7 @@ const Index = () => {
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold bg-gradient-desert bg-clip-text text-transparent">
-                    Sui TodoList Pro
+                    Todo List on sui
                   </h1>
                   <p className="text-sm text-muted-foreground">
                     Blockchain-powered task management
