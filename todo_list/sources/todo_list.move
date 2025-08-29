@@ -1,23 +1,23 @@
+#[allow(duplicate_alias)]
 module todo_list::todo_list {
     use std::string::String;
     use std::vector;
 
-    /// =========================
+
     /// Original Struct
-    /// =========================
+
     public struct TodoList has key, store {
         id: UID,
         name: String,
         items: vector<String>,
     }
 
-    /// =========================
+
     /// New Struct for Advanced Items
-    /// =========================
+
     public struct TodoItem has store, drop {
         description: String,
-        status: u8, // 0 = pending, 1 = done, 2 = cancelled
-    }
+        status: u8, // 0 = pending, 1 = done, 2 = cancelled 3 - markas done
 
     public struct TodoListV2 has key, store {
         id: UID,
@@ -25,9 +25,9 @@ module todo_list::todo_list {
         items: vector<TodoItem>,
     }
 
-    /// =========================
+
     /// Original Functions (unchanged)
-    /// =========================
+
     public fun new(name: String, ctx: &mut TxContext): TodoList {
         TodoList {
             id: object::new(ctx),
@@ -58,9 +58,9 @@ module todo_list::todo_list {
         self.name
     }
 
-    /// =========================
+
     /// New Functions for V2
-    /// =========================
+ 
     public fun new_v2(name: String, ctx: &mut TxContext): TodoListV2 {
         TodoListV2 {
             id: object::new(ctx),
