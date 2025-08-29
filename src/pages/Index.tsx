@@ -57,7 +57,7 @@ const Index = () => {
     }
   }, [currentAccount]);
 
-  const executeTransaction = (tx: Transaction, action: string) => {
+  const executeTransaction = (tx: Transaction, action: string, onSuccessExtra?: (result: any) => void) => {
     if (!currentAccount) {
       toast({
         title: "Wallet not connected",
@@ -70,17 +70,34 @@ const Index = () => {
     signAndExecute(
       { transaction: tx },
       {
-        onSuccess: (result) => {
+        onSuccess: (result: any) => {
           toast({
             title: "Transaction successful",
             description: `${action} completed successfully`,
           });
           console.log('Transaction result:', result);
+
+          // If a new object was created (e.g. createTodoList), extract its objectId
+          try {
+            const created = result?.effects?.created;
+            if (created && created.length > 0) {
+              const first = created[0];
+              const objectId = first?.reference?.objectId;
+              if (objectId) {
+                // Save to state so subsequent calls can use it
+                setTodoListObjectId(objectId);
+              }
+            }
+          } catch (e) {
+            console.warn('Could not parse created object id from tx result', e);
+          }
+
+          if (onSuccessExtra) onSuccessExtra(result);
         },
         onError: (error) => {
           toast({
             title: "Transaction failed",
-            description: error.message || "Something went wrong",
+            description: error?.message || "Something went wrong",
             variant: "destructive",
           });
           console.error('Transaction error:', error);
@@ -95,14 +112,20 @@ const Index = () => {
     setIsCreatingList(true);
     const tx = new Transaction();
     
-    // Create new todo list
+    // Pass the name argument (Move function: new(name: String, ctx: &mut TxContext))
+    const listName = "My TodoList"; // or prompt user for a name
     tx.moveCall({
       target: `${PACKAGE_ID}::${MODULE_NAME}::new`,
-      arguments: [],
+      arguments: [
+        tx.pure.string(listName),
+      ],
     });
 
-    executeTransaction(tx, "Todo list creation");
-    setIsCreatingList(false);
+    // executeTransaction will parse the created object id and set todoListObjectId
+    executeTransaction(tx, "Todo list creation", (result) => {
+      setIsCreatingList(false);
+      console.log('Created TodoList tx result', result);
+    });
   };
 
   const addTodo = () => {

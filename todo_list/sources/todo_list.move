@@ -17,7 +17,8 @@ module todo_list::todo_list {
 
     public struct TodoItem has store, drop {
         description: String,
-        status: u8, // 0 = pending, 1 = done, 2 = cancelled 3 - markas done
+        status: u8, // 0 = pending, 1 = done, 2 = cancelled
+    } // <-- added missing closing brace
 
     public struct TodoListV2 has key, store {
         id: UID,
