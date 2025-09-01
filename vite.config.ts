@@ -19,4 +19,10 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    include: ['@mysten/sui.js', '@mysten/dapp-kit'],
+  },
+  ssr: {
+    noExternal: ['@mysten/sui.js', '@mysten/dapp-kit'],
+  },
 }));
